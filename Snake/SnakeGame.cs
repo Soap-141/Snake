@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Snake.Components;
 
 namespace Snake;
 
@@ -80,7 +81,7 @@ public sealed class SnakeGame : Game
     /// <param name="gameTime">The game time.</param>
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        GraphicsDevice.Clear(Color.Transparent);
         SpriteBatch.Begin();
         base.Draw(gameTime);
         SpriteBatch.End();
