@@ -221,6 +221,7 @@ public sealed class SnakeComponent : DrawableGameComponent
         DrawNeck();
         DrawBody();
         DrawInterpolatedParts();
+
         base.Draw(gameTime);
     }
 
@@ -232,22 +233,44 @@ public sealed class SnakeComponent : DrawableGameComponent
     /// </remarks>
     private void DrawNeck()
     {
-        if (Parts.Count <= 1)
+        if (Parts.Count <= 2)
         {
             return;
         }
 
-        var neckTexture = Head.Direction switch
-        {
-            Direction.Up => _snakeTextures[SnakeTexture.BodyVertical],
-            Direction.Down => _snakeTextures[SnakeTexture.BodyVertical],
-            Direction.Left => _snakeTextures[SnakeTexture.BodyHorizontal],
-            Direction.Right => _snakeTextures[SnakeTexture.BodyHorizontal],
-            _ => _snakeTextures[SnakeTexture.BodyHorizontal],
-        };
+        var neckTexture = default(Texture2D);
+        var destinationRectangle = default(Rectangle);
 
-        // TODO: Fix the current neck.
-        SnakeGame.SpriteBatch.Draw(neckTexture, new Rectangle(Head.Position.X, Head.Position.Y, 16, 16), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0f);
+        switch (Head.Direction)
+        {
+            case Direction.Up:
+                neckTexture = _snakeTextures[SnakeTexture.BodyVertical];
+                destinationRectangle = new Rectangle(Head.Position.X, (int)_interpolatedHeadPosition.Y + TextureSize.Height, TextureSize.Width, Head.Position.Y - (int)_interpolatedHeadPosition.Y);
+                break;
+            case Direction.Down:
+                neckTexture = _snakeTextures[SnakeTexture.BodyVertical];
+                destinationRectangle = new Rectangle(Head.Position.X, Head.Position.Y, TextureSize.Width, (int)_interpolatedHeadPosition.Y - Head.Position.Y);
+                break;
+            case Direction.Left:
+                neckTexture = _snakeTextures[SnakeTexture.BodyHorizontal];
+                destinationRectangle = new Rectangle((int)_interpolatedHeadPosition.X + TextureSize.Width, Head.Position.Y, Head.Position.X - (int)_interpolatedHeadPosition.X, TextureSize.Height);
+                break;
+            case Direction.Right:
+                neckTexture = _snakeTextures[SnakeTexture.BodyHorizontal];
+                destinationRectangle = new Rectangle(Head.Position.X, Head.Position.Y, (int)_interpolatedHeadPosition.X - Head.Position.X, TextureSize.Height);
+                break;
+        }
+
+        SnakeGame.SpriteBatch.Draw(
+            texture: neckTexture,
+            destinationRectangle: destinationRectangle,
+            sourceRectangle: null,
+            color: Color.White,
+            rotation: 0f,
+            origin: Vector2.Zero,
+            effects: SpriteEffects.None,
+            layerDepth: 0f
+        );
     }
 
     private void DrawBody()
@@ -296,7 +319,6 @@ public sealed class SnakeComponent : DrawableGameComponent
             _ => Point.Zero,
         };
         Parts.AddLast(new SnakePart(nextTailPosition, tail.Direction));
-        // TODO: Update interpolated tail?
     }
 
     /// <summary>
@@ -384,8 +406,20 @@ public sealed class SnakeComponent : DrawableGameComponent
 
         if (Parts.Count > 1)
         {
-            var nextTailPosition = GetNextPosition(tail.Position.ToVector2(), tail.Direction);
-            _interpolatedTailPosition = Vector2.Lerp(tail.Position.ToVector2(), nextTailPosition, interpolationFactor);
+            var direction = tail.Direction;
+            var nextTailPosition = GetNextPosition(tail.Position.ToVector2(), direction);
+
+            // We need to add an offset to the tail's position because the last part of the body end up under the tail's (we can see the corner behind the tail).
+            var nextTailPositionOffset = direction switch
+            {
+                Direction.Up => new Vector2(0f, 2f),
+                Direction.Down => new Vector2(0f, -2f),
+                Direction.Left => new Vector2(2f, 0f),
+                Direction.Right => new Vector2(-2f, 0f),
+                _ => Vector2.Zero,
+            };
+
+            _interpolatedTailPosition = Vector2.Lerp(tail.Position.ToVector2(), nextTailPosition + nextTailPositionOffset, interpolationFactor);
         }
     }
 
@@ -432,8 +466,7 @@ public sealed class SnakeComponent : DrawableGameComponent
             Direction.Right => _snakeTextures[SnakeTexture.HeadRight],
             _ => _snakeTextures[SnakeTexture.HeadRight],
         };
-        // TODO: Remove the hardcoded color.
-        SnakeGame.SpriteBatch.Draw(headTexture, _interpolatedHeadPosition, null, Color.Red, 0f, Vector2.Zero, _textureScale, SpriteEffects.None, 0f);
+        SnakeGame.SpriteBatch.Draw(headTexture, _interpolatedHeadPosition, null, Color.White, 0f, Vector2.Zero, _textureScale, SpriteEffects.None, 0f);
     }
 
     /// <summary>
@@ -451,8 +484,7 @@ public sealed class SnakeComponent : DrawableGameComponent
                 Direction.Right => _snakeTextures[SnakeTexture.TailLeft],
                 _ => _snakeTextures[SnakeTexture.TailLeft]
             };
-            // TODO: Remove the hardcoded color.
-            SnakeGame.SpriteBatch.Draw(tailTexture, (Vector2)_interpolatedTailPosition, null, Color.Red, 0f, Vector2.Zero, _textureScale, SpriteEffects.None, 0f);
+            SnakeGame.SpriteBatch.Draw(tailTexture, (Vector2)_interpolatedTailPosition, null, Color.White, 0f, Vector2.Zero, _textureScale, SpriteEffects.None, 0f);
         }
     }
 }
