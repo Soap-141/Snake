@@ -15,14 +15,14 @@ public struct SnakePart
     /// <summary>
     /// The direction.
     /// </summary>
-    public Direction? Direction { get; set; }
+    public Direction Direction { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SnakePart"/> class.
     /// </summary>
     /// <param name="position">The position.</param>
     /// <param name="direction">The direction.</param>
-    public SnakePart(Point position, Direction? direction)
+    public SnakePart(Point position, Direction direction)
     {
         Position = position;
         Direction = direction;

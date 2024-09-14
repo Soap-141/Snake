@@ -37,9 +37,19 @@ public sealed class MapComponent : DrawableGameComponent
     private readonly SnakeComponent _snake;
 
     /// <summary>
+    /// The score.
+    /// </summary>
+    private readonly ScoreComponent _score;
+
+    /// <summary>
+    /// The game over component.
+    /// </summary>
+    private readonly GameOverComponent _gameOver;
+
+    /// <summary>
     /// The grss texture.
     /// </summary>
-    private Texture2D _grassTexture;
+    private Texture2D? _grassTexture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MapComponent"/> class.
@@ -51,7 +61,10 @@ public sealed class MapComponent : DrawableGameComponent
     {
         _size = new System.Drawing.Size(width, height);
         _apple = new AppleComponent(game, new Point(48, 48));
-        _snake = new SnakeComponent(game, new Point(0, 0));
+        _snake = new SnakeComponent(game, new Point(SnakeComponent.TextureSize.Width * 2, 0), Direction.Right);
+        _score = new ScoreComponent(game, new Vector2(6, height - 30)); // The sprite font size is 48 but we scale the score at 50%.
+        _gameOver = new GameOverComponent(game);
+
         UpdateOrder = 0;
         DrawOrder = 0;
     }
@@ -63,6 +76,8 @@ public sealed class MapComponent : DrawableGameComponent
     {
         Game.Components.Add(_apple);
         Game.Components.Add(_snake);
+        Game.Components.Add(_score);
+        Game.Components.Add(_gameOver);
 
         base.Initialize();
     }
@@ -82,7 +97,8 @@ public sealed class MapComponent : DrawableGameComponent
     /// </summary>
     protected override void UnloadContent()
     {
-        _grassTexture.Dispose();
+        _grassTexture?.Dispose();
+        _grassTexture = null;
 
         base.UnloadContent();
     }
@@ -124,6 +140,12 @@ public sealed class MapComponent : DrawableGameComponent
         {
             // TODO: Handle game over differently?
 
+            // Visible needs to be set before Enabled otherwise the game over won't be drawn?
+            _gameOver.Visible = true;
+            _gameOver.Enabled = true;
+
+            _score.Score = 0;
+
             // Visible needs to be set before Enabled otherwise the snake won't be drawn?
             _snake.Visible = false; // Stops drawing the snake.
             _snake.Enabled = false; // Stops updating the snake.
@@ -135,6 +157,7 @@ public sealed class MapComponent : DrawableGameComponent
         }
         else if (CanSnakeEat())
         {
+            _score.Score++;
             _snake.Grow();
             SetRandomApplePosition();
         }
