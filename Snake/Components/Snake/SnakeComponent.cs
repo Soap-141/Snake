@@ -132,7 +132,7 @@ public sealed class SnakeComponent : DrawableGameComponent
     /// On enabled changed event.
     /// </summary>
     /// <param name="sender">The sender.</param>
-    /// <param name="e">the event arguments.</param>
+    /// <param name="e">The event arguments.</param>
     protected override void OnEnabledChanged(object sender, EventArgs e)
     {
         if (!Enabled)
@@ -249,7 +249,7 @@ public sealed class SnakeComponent : DrawableGameComponent
                 break;
             case Direction.Down:
                 neckTexture = _snakeTextures[SnakeTexture.BodyVertical];
-                destinationRectangle = new Rectangle(Head.Position.X, Head.Position.Y, TextureSize.Width, (int)_interpolatedHeadPosition.Y - Head.Position.Y);
+                destinationRectangle = new Rectangle(Head.Position.X, Head.Position.Y, TextureSize.Width, (int)MathF.Round(_interpolatedHeadPosition.Y) - Head.Position.Y);
                 break;
             case Direction.Left:
                 neckTexture = _snakeTextures[SnakeTexture.BodyHorizontal];
@@ -257,7 +257,7 @@ public sealed class SnakeComponent : DrawableGameComponent
                 break;
             case Direction.Right:
                 neckTexture = _snakeTextures[SnakeTexture.BodyHorizontal];
-                destinationRectangle = new Rectangle(Head.Position.X, Head.Position.Y, (int)_interpolatedHeadPosition.X - Head.Position.X, TextureSize.Height);
+                destinationRectangle = new Rectangle(Head.Position.X, Head.Position.Y, (int)MathF.Round(_interpolatedHeadPosition.X) - Head.Position.X, TextureSize.Height);
                 break;
         }
 
@@ -292,6 +292,19 @@ public sealed class SnakeComponent : DrawableGameComponent
 
             part = part.Next;
         };
+
+        if (_interpolatedTailPosition is not null)
+        {
+            var tailTexture = Tail.Direction switch
+            {
+                Direction.Up => _snakeTextures[SnakeTexture.TailDown],
+                Direction.Down => _snakeTextures[SnakeTexture.TailUp],
+                Direction.Left => _snakeTextures[SnakeTexture.TailRight],
+                Direction.Right => _snakeTextures[SnakeTexture.TailLeft],
+                _ => _snakeTextures[SnakeTexture.TailLeft]
+            };
+            SnakeGame.SpriteBatch.Draw(tailTexture, Tail.Position.ToVector2(), null, Color.White, 0f, Vector2.Zero, _textureScale, SpriteEffects.None, 0f);
+        }
     }
 
     /// <summary>
@@ -386,7 +399,7 @@ public sealed class SnakeComponent : DrawableGameComponent
         Parts.RemoveLast();
 
         // Update the tail's direction (for the right texture).
-        if (Parts.Count > 1)
+        if (_interpolatedTailPosition is not null)
         {
             Tail.Direction = Parts.Last!.Previous!.ValueRef.Direction;
         }
@@ -399,27 +412,34 @@ public sealed class SnakeComponent : DrawableGameComponent
     {
         var head = Head;
         var tail = Tail;
+        var snakeLength = Parts.Count;
         var interpolationFactor = _timeSinceLastMove / _moveInterval;
         var nextHeadPosition = GetNextPosition(head.Position.ToVector2(), head.Direction);
 
         _interpolatedHeadPosition = Vector2.Lerp(head.Position.ToVector2(), nextHeadPosition, interpolationFactor);
 
-        if (Parts.Count > 1)
+        if (snakeLength > 1)
         {
             var direction = tail.Direction;
             var nextTailPosition = GetNextPosition(tail.Position.ToVector2(), direction);
 
-            // We need to add an offset to the tail's position because the last part of the body end up under the tail's (we can see the corner behind the tail).
-            var nextTailPositionOffset = direction switch
+            /*
+            if (snakeLength > 2)
             {
-                Direction.Up => new Vector2(0f, 2f),
-                Direction.Down => new Vector2(0f, -2f),
-                Direction.Left => new Vector2(2f, 0f),
-                Direction.Right => new Vector2(-2f, 0f),
-                _ => Vector2.Zero,
-            };
+                // We need to add an offset to the tail's position because the last part of the body end up under the tail's (we can see the corner behind the tail).
+                var nextTailPositionOffset = direction switch
+                {
+                    Direction.Up => new Vector2(0f, 1.5f),
+                    Direction.Down => new Vector2(0f, -1.5f),
+                    Direction.Left => new Vector2(1.5f, 0f),
+                    Direction.Right => new Vector2(-1.5f, 0f),
+                    _ => Vector2.Zero,
+                };
+                nextTailPosition += nextTailPositionOffset;
+            }
+            */
 
-            _interpolatedTailPosition = Vector2.Lerp(tail.Position.ToVector2(), nextTailPosition + nextTailPositionOffset, interpolationFactor);
+            _interpolatedTailPosition = Vector2.Lerp(tail.Position.ToVector2(), nextTailPosition, interpolationFactor);
         }
     }
 
@@ -450,7 +470,11 @@ public sealed class SnakeComponent : DrawableGameComponent
     private void DrawInterpolatedParts()
     {
         DrawInterpolatedHead();
+
+        // TODO: Fix the interpolated tail position.
+        /*
         DrawInterpolatedTail();
+        */
     }
 
     /// <summary>

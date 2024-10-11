@@ -28,7 +28,7 @@ public sealed class AppleComponent : DrawableGameComponent
     /// <summary>
     /// The apple texture.
     /// </summary>
-    private Texture2D _appleTexture;
+    private Texture2D? _texture;
 
     /// <summary>
     /// The position of the apple.
@@ -53,26 +53,27 @@ public sealed class AppleComponent : DrawableGameComponent
     /// </summary>
     protected override void LoadContent()
     {
-        _appleTexture = Game.Content.Load<Texture2D>("Apple");
+        _texture = Game.Content.Load<Texture2D>("Apple");
 
         base.LoadContent();
     }
 
     /// <summary>
-    /// 
+    /// Unloads the apple's content.
     /// </summary>
     protected override void UnloadContent()
     {
-        _appleTexture.Dispose();
+        _texture?.Dispose();
+        _texture = null;
 
         base.UnloadContent();
     }
 
     /// <summary>
-    /// 
+    /// On enabled changed event.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
+    /// <param name="sender">The sender.</param>
+    /// <param name="args">The event arguments.</param>
     protected override void OnEnabledChanged(object sender, EventArgs args)
     {
         if (!Enabled)
@@ -92,7 +93,7 @@ public sealed class AppleComponent : DrawableGameComponent
     /// <param name="gameTime">The game time.</param>
     public override void Draw(GameTime gameTime)
     {
-        SnakeGame.SpriteBatch.Draw(_appleTexture, Position.ToVector2(), null, Color.White, 0f, Vector2.Zero, 0.4f, SpriteEffects.None, 0f);
+        SnakeGame.SpriteBatch.Draw(_texture, Position.ToVector2(), null, Color.White, 0f, Vector2.Zero, 0.4f, SpriteEffects.None, 0f);
 
         base.Draw(gameTime);
     }
