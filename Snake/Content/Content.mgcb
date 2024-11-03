@@ -25,6 +25,12 @@
 /processorParam:TextureFormat=Color
 /build:Apple.png
 
+#begin Background_Sound_Effect.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Background_Sound_Effect.mp3
+
 #begin BodyBottomLeft.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -157,12 +163,54 @@
 /processorParam:TextureFormat=Color
 /build:HeadUp.png
 
+#begin Laugh_Evil_00.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Laugh_Evil_00.wav
+
+#begin Laugh_Evil_01.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Laugh_Evil_01.wav
+
+#begin Laugh_Evil_02.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Laugh_Evil_02.wav
+
 #begin Pixels.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Pixels.spritefont
+
+#begin Pumpkin.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Pumpkin.png
+
+#begin RedCursor.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:RedCursor.png
 
 #begin TailDown.png
 /importer:TextureImporter
@@ -211,4 +259,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:TailUp.png
+
+#begin WhiteBackground.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:WhiteBackground.png
 

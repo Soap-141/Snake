@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 using Snake.Components.Snake;
 using System;
 using System.Linq;
@@ -13,6 +15,11 @@ namespace Snake.Components;
 /// </summary>
 public sealed class MapComponent : DrawableGameComponent
 {
+    /// <summary>
+    /// The random number generator used to generate random numbers for the game over sound effects.
+    /// </summary>
+    private readonly Random _random = new();
+
     /// <summary>
     /// The texture size.
     /// </summary>
@@ -52,6 +59,16 @@ public sealed class MapComponent : DrawableGameComponent
     private Texture2D? _grassTexture;
 
     /// <summary>
+    /// The background sound stream.
+    /// </summary>
+    private Song? _backgroundSoundStream;
+
+    /// <summary>
+    /// The game over sound effect.
+    /// </summary>
+    private SoundEffect[]? _gameOverSoundEffects;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="MapComponent"/> class.
     /// </summary>
     /// <param name="game">The game.</param>
@@ -88,6 +105,16 @@ public sealed class MapComponent : DrawableGameComponent
     protected override void LoadContent()
     {
         _grassTexture = Game.Content.Load<Texture2D>("Grass");
+        _backgroundSoundStream = Game.Content.Load<Song>("Background_Sound_Effect");
+        _gameOverSoundEffects = [
+            Game.Content.Load<SoundEffect>("Laugh_Evil_00"),
+            Game.Content.Load<SoundEffect>("Laugh_Evil_01"),
+            Game.Content.Load<SoundEffect>("Laugh_Evil_02"),
+        ];
+
+        MediaPlayer.IsRepeating = true;
+        MediaPlayer.Volume = 0.5f;
+        MediaPlayer.Play(_backgroundSoundStream);
 
         base.LoadContent();
     }
@@ -99,6 +126,15 @@ public sealed class MapComponent : DrawableGameComponent
     {
         _grassTexture?.Dispose();
         _grassTexture = null;
+
+        _backgroundSoundStream?.Dispose();
+        _backgroundSoundStream = null;
+
+        foreach (var soundEffect in _gameOverSoundEffects!)
+        {
+            soundEffect?.Dispose();
+        }
+        _gameOverSoundEffects = null;
 
         base.UnloadContent();
     }
@@ -139,6 +175,9 @@ public sealed class MapComponent : DrawableGameComponent
         if (_snake.IsCollidingWithItself() || IsSnakeCollidingWithWall())
         {
             // TODO: Handle game over differently?
+
+            var index = _random.Next(0, _gameOverSoundEffects!.Length);
+            _gameOverSoundEffects![index].Play();
 
             // Visible needs to be set before Enabled otherwise the game over won't be drawn?
             _gameOver.Visible = true;

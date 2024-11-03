@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Snake.Components;
 
@@ -29,6 +30,11 @@ public sealed class GameOverComponent : DrawableGameComponent
     private SpriteFont? _spriteFont;
 
     /// <summary>
+    /// The background texture.
+    /// </summary>
+    private Texture? _backgroundTexture;
+
+    /// <summary>
     /// The game over title text's position.
     /// </summary>
     private Vector2 _titlePosition;
@@ -56,6 +62,7 @@ public sealed class GameOverComponent : DrawableGameComponent
     protected override void LoadContent()
     {
         _spriteFont = Game.Content.Load<SpriteFont>("Pixels");
+        _backgroundTexture = Game.Content.Load<Texture2D>("WhiteBackground");
 
         var titleTextSize = _spriteFont.MeasureString(_titleText);
         var subTitleTextSize = _spriteFont.MeasureString(_subTitleText) * _subTitleScale;
@@ -85,6 +92,13 @@ public sealed class GameOverComponent : DrawableGameComponent
         base.UnloadContent();
     }
 
+    public override void Update(GameTime gameTime)
+    {
+        HandleInput();
+
+        base.Update(gameTime);
+    }
+
     /// <summary>
     /// Draws the game over.
     /// </summary>
@@ -101,12 +115,20 @@ public sealed class GameOverComponent : DrawableGameComponent
 
     private void DrawBackground()
     {
-        /*
-        var backgroundTexture = new Texture2D(GraphicsDevice, Game.Window.ClientBounds.Width, Game.Window.ClientBounds.Height,);
+        SnakeGame.SpriteBatch.Draw((Texture2D)_backgroundTexture!, new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+    }
 
-        backgroundTexture.SetData(new[] { Color.White }, );
+    /// <summary>
+    /// Handles the snake's input.
+    /// </summary>
+    private void HandleInput()
+    {
+        var keyboardState = Keyboard.GetState();
 
-        SnakeGame.SpriteBatch.Draw(backgroundTexture, Vector2.Zero, Color.White);
-        */
+        if (keyboardState.IsKeyDown(Keys.Enter))
+        {
+            Enabled = false;
+            Visible = false;
+        }
     }
 }

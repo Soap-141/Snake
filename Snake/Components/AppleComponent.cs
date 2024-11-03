@@ -53,7 +53,10 @@ public sealed class AppleComponent : DrawableGameComponent
     /// </summary>
     protected override void LoadContent()
     {
+        /*
         _texture = Game.Content.Load<Texture2D>("Apple");
+        */
+        _texture = Game.Content.Load<Texture2D>("Pumpkin");
 
         base.LoadContent();
     }
@@ -93,7 +96,8 @@ public sealed class AppleComponent : DrawableGameComponent
     /// <param name="gameTime">The game time.</param>
     public override void Draw(GameTime gameTime)
     {
-        SnakeGame.SpriteBatch.Draw(_texture, Position.ToVector2(), null, Color.White, 0f, Vector2.Zero, 0.4f, SpriteEffects.None, 0f);
+        // Apple scale 0.4f, and for the Pumpkin scale 1f.
+        SnakeGame.SpriteBatch.Draw(_texture, Position.ToVector2(), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f); 
 
         base.Draw(gameTime);
     }

@@ -11,14 +11,19 @@ namespace Snake;
 public sealed class SnakeGame : Game
 {
     /// <summary>
-    /// Used to initialize and control the presentation of the graphics device.
-    /// </summary>
-    private readonly GraphicsDeviceManager _graphics;
-
-    /// <summary>
     /// The map.
     /// </summary>
     private readonly MapComponent _map;
+
+    /// <summary>
+    /// The cursor texture.
+    /// </summary>
+    private Texture2D? _cursorTexture;
+
+    /// <summary>
+    /// Used to initialize and control the presentation of the graphics device.
+    /// </summary>
+    private GraphicsDeviceManager _graphics;
 
     /// <summary>
     /// The sprite batch used to draw textures.
@@ -37,6 +42,7 @@ public sealed class SnakeGame : Game
             SynchronizeWithVerticalRetrace = true
         };
         _map = new MapComponent(this, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
     }
@@ -56,7 +62,11 @@ public sealed class SnakeGame : Game
     /// </summary>
     protected override void LoadContent()
     {
+        _cursorTexture = Content.Load<Texture2D>("RedCursor");
+
         SpriteBatch = new SpriteBatch(GraphicsDevice);
+
+        Mouse.SetCursor(MouseCursor.FromTexture2D(_cursorTexture, 0, 0));
     }
 
     /// <summary>
